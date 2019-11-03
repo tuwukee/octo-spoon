@@ -1,11 +1,5 @@
 <script>
-  export let name;
+  import Entries from "./svelte_app/src/entries.svelte";
 </script>
 
-<style>
-  h1 {
-    color: #FF3E00;
-  }
-</style>
-
-<h1>Hello {name}!</h1>
+<Entries/>
