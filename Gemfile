@@ -11,6 +11,8 @@ gem "rails", "~> 6.0.0"
 gem "sass-rails", "~> 5"
 gem "slim", "~> 4.0"
 gem "webpacker", git: "https://github.com/rails/webpacker"
+gem "fast_jsonapi"
+gem "active_model_serializers"
 
 group :development, :test do
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]

@@ -3,7 +3,8 @@
 module V1
   class EntriesController < V1::BaseController
     def index
-      render json: Entry.all
+      @entries = Entry.all
+      render json: V1::EntriesSerializer.new(@entries).serialized_json
     end
   end
 end
