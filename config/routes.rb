@@ -6,5 +6,6 @@ Rails.application.routes.draw do
 
   namespace :v1, constraints: { format: :json } do
     resources :entries, only: [:index]
+    resources :days, only: [:index]
   end
 end

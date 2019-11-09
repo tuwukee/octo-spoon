@@ -1,5 +1,6 @@
 <script>
-  import Entries from "./svelte_app/src/entries.svelte";
+  import Router from 'svelte-spa-router'
+  import { routes } from './svelte_app/routes'
 </script>
 
-<Entries/>
+<Router {routes} />
