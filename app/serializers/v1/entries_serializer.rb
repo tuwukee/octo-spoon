@@ -2,6 +2,6 @@
 
 module V1
   class EntriesSerializer < V1::BaseSerializer
-    attributes :created_at, :content, :total, :weight
+    attributes :content, :total, :type, :time
   end
 end

@@ -5,9 +5,13 @@
   let data = [];
 
   onMount(async function() {
-    const response = await fetch(url).catch(e => console.log("Error: ", e.message));
-    const json = await response.json().catch(e => console.log("Error: ", e.message));
-    data = json.data;
+    try {
+      const response = await fetch(url);
+      const json = await response.json();
+      data = json.data;
+    } catch (error) {
+      console.log(error);
+    }
   });
 </script>
 
