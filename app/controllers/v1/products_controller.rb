@@ -5,8 +5,11 @@ module V1
     before_action :find_product, only: [:show, :destroy, :update]
 
     def index
-      @products = Product.all
-      render json: V1::ProductsSerializer.new(@products).serialized_json
+      @products = Product
+        .page(page_params[:number])
+        .per(page_params[:size])
+      options = { meta: meta(@products) }
+      render json: V1::ProductsSerializer.new(@products, options).serialized_json
     end
 
     def create
