@@ -9,4 +9,6 @@ Rails.application.routes.draw do
     resources :days, only: [:index]
     resources :products, only: [:index, :create, :update, :destroy, :show]
   end
+
+  get "*path", to: "home#index"
 end

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module V1
-  class BaseController < ActionController::Base
+  class BaseController < ActionController::API
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
+    rescue_from ActionController::ParameterMissing, with: :forbidden
 
     private
 
@@ -12,11 +13,23 @@ module V1
           errors: [{
             title: "Not Found",
             detail: "Record not found",
-            code: 404,
             status: 404
           }]
         },
-        status: 404
+        status: :not_found
+      )
+    end
+
+    def forbidden(exception)
+      render(
+        json: {
+          errors: [{
+            title: "Forbidden",
+            detail: exception.to_s,
+            status: 403
+          }]
+        },
+        status: :forbidden
       )
     end
   end

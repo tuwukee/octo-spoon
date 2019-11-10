@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V1
-  class ProductsController < V1::BaseController
+  class ProductsController < V1::ResourcesController
     before_action :find_product, only: [:show, :destroy, :update]
 
     def index
@@ -10,6 +10,16 @@ module V1
     end
 
     def create
+      @product = Product.new(resource_params)
+      if @product.save
+        render json: V1::ProductsSerializer.new(@product).serialized_json
+      else
+        render json: {
+          errors: @product.errors.map do |key, value|
+            { title: key, detail: value, status: 422 }
+          end
+        }, status: :unprocessable_entity
+      end
     end
 
     def destroy
