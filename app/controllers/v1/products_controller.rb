@@ -23,9 +23,27 @@ module V1
     end
 
     def destroy
+      if @product.destroy
+        head(:no_content)
+      else
+        render json: {
+          errors: @product.errors.map do |key, value|
+            { title: key, detail: value, status: 422 }
+          end
+        }, status: :unprocessable_entity
+      end
     end
 
     def update
+      if @product.update(resource_params)
+        render json: V1::ProductsSerializer.new(@product).serialized_json
+      else
+        render json: {
+          errors: @product.errors.map do |key, value|
+            { title: key, detail: value, status: 422 }
+          end
+        }, status: :unprocessable_entity
+      end
     end
 
     def show

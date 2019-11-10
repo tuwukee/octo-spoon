@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
 
   let url = "/v1/products";
-  let data = [];
+  let products = [];
   let new_name = "";
   let new_calories = "";
 
@@ -10,14 +10,70 @@
     try {
       const response = await fetch(url);
       const json = await response.json();
-      data = json.data;
+      if (response.ok) {
+        products = json.data;
+      } else {
+        // TODO: flash message
+        console.log("Errors:", json);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Exception:", error);
     }
   });
 
-  function createProduct() {
-    let body = {
+  async function destroyProduct(product) {
+    let result = confirm("Are you sure?");
+    if (result == false) return false;
+
+    const destroy_url = "/v1/products/" + product.id;
+
+    try {
+      const response = await fetch(destroy_url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+
+      if (response.ok) {
+        products = products.filter(obj => obj.id !== product.id);
+      } else {
+        const json = await response.json();
+        // TODO: flash message
+        console.log("Errors:", json);
+      }
+    } catch (exception) {
+      console.log("Exception:", exception);
+    }
+  }
+
+  async function updateProduct(product) {
+    const update_url = "/v1/products/" + product.id;
+    const body = { data: product };
+
+    try {
+      const response = await fetch(update_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })
+      const json = await response.json();
+
+      if (response.ok) {
+        // Do nothing
+      } else {
+        // TODO: flash message
+        console.log("Errors:", json);
+      }
+    } catch (exception) {
+      console.log("Exception:", exception);
+    }
+  }
+
+  async function createProduct() {
+    const body = {
       data: {
         type: "products",
         attributes: {
@@ -27,27 +83,27 @@
       }
     };
 
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    })
-    .then((response) => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })
+      const json = await response.json();
+
       if (response.ok) {
-        return response.json()
+        products = [...products, json.data];
+        new_name = "";
+        new_calories = "";
       } else {
-        return Promise.reject({ status: response.status, statusText: response.statusText, body: response.json() });
+        // TODO: flash message
+        console.log("Errors:", json);
       }
-    })
-    .then((new_data) => {
-      data.push(new_data);
-    })
-    .catch((error) => {
-      console.log("Error message:", error.statusText);
-      error.body.then(body => console.log(body));
-    });
+    } catch (exception) {
+      console.log("Exception:", exception);
+    }
   }
 </script>
 
@@ -64,11 +120,28 @@
   <button on:click={createProduct} disabled="{!new_name || !new_calories}">Create Product</button>
 </div>
 
-<div>{JSON.stringify(data)}</div>
-<ul>
-  {#each data as product}
-    <li>
-      {JSON.stringify(product)}
-    </li>
+<table id="products">
+  <tr>
+    <th>Name</th>
+    <th>Calories</th>
+    <th>Protein</th>
+    <th>Carbohydrate</th>
+    <th>Fat</th>
+    <th>Cellulose</th>
+    <th />
+
+  </tr>
+  {#each products as product}
+    <tr>
+      <td contenteditable="true" bind:textContent={product.attributes.name} on:blur={() => updateProduct(product)} />
+      <td contenteditable="true" bind:textContent={product.attributes.calories} on:blur={() => updateProduct(product)} />
+      <td contenteditable="true" bind:textContent={product.attributes.protein} on:blur={() => updateProduct(product)} />
+      <td contenteditable="true" bind:textContent={product.attributes.carbohydrate} on:blur={() => updateProduct(product)} />
+      <td contenteditable="true" bind:textContent={product.attributes.fat} on:blur={() => updateProduct(product)} />
+      <td contenteditable="true" bind:textContent={product.attributes.cellulose} on:blur={() => updateProduct(product)} />
+      <td>
+        <button on:click={() => destroyProduct(product)}>Destroy</button>
+      </td>
+    </tr>
   {/each}
-</ul>
+</table>
