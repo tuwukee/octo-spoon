@@ -15,7 +15,7 @@ module V1
     def create
       @product = Product.new(resource_params)
       if @product.save
-        render json: V1::ProductsSerializer.new(@product).serialized_json
+        render json: V1::ProductsSerializer.new(@product).serialized_json, status: 201
       else
         render json: {
           errors: @product.errors.map do |key, value|

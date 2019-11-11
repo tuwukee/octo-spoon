@@ -1,17 +1,35 @@
 <script>
   import { onMount } from "svelte";
+  import Pagination from "../shared/pagination"
 
-  let url = "/v1/products";
+  export let page_id = 1;
+  const url = "/v1/products";
+  const ui_url = "/products";
+
   let products = [];
+  let meta = {
+    total_pages: 0,
+    current_page: 1
+  };
   let new_name = "";
   let new_calories = "";
 
-  onMount(async function() {
+  onMount(() => getProducts());
+
+  function setPageId(new_page_id) {
+    page_id = new_page_id;
+    getProducts();
+  }
+
+  async function getProducts() {
+    const products_url = url + "?page[number]=" + page_id;
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(products_url);
       const json = await response.json();
       if (response.ok) {
         products = json.data;
+        meta = json.meta;
       } else {
         // TODO: flash message
         console.log("Errors:", json);
@@ -19,7 +37,7 @@
     } catch (error) {
       console.log("Exception:", error);
     }
-  });
+  }
 
   async function destroyProduct(product) {
     let result = confirm("Are you sure?");
@@ -145,3 +163,6 @@
     </tr>
   {/each}
 </table>
+
+<Pagination meta={meta} url={ui_url} setPageId={setPageId} />
+

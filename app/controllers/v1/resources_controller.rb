@@ -4,23 +4,21 @@ module V1
   class ResourcesController < V1::BaseController
     PAGE_PARAMS = {
       number: 1,
-      size: 50
-    }
+      size: 1
+    }.with_indifferent_access
 
     protected
 
-    def meta(resource)
+    def meta(collection)
       {
-        current_page:  resource.current_page,
-        next_page:     resource.next_page,
-        previous_page: resource.prev_page,
-        total_pages:   resource.total_pages,
-        total_count:   resource.total_count
+        current_page: collection.current_page,
+        total_pages:  collection.total_pages,
+        total_count:  collection.total_count
       }
     end
 
     def page_params
-      return PAGE_PARAMS.merge(params[:page]) if params[:page]
+      return PAGE_PARAMS.merge(params[:page].permit(:number, :size)) if params[:page]
 
       PAGE_PARAMS
     end
